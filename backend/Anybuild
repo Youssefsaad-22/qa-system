@@ -1,0 +1,19 @@
+# Anybuild (Wasmer) config — force dynamic Node/Express provider
+# (prevents the upload flow from detecting this as a static site).
+# Generated format: https://github.com/wasmerio/anybuild
+load("//anybuild/tools:node.bzl", "node_build", "node_config", "node_serve")
+
+config = node_config(
+    schema = 1,
+    commands = {
+        "start": "npm start",
+    },
+    node_package_manager = "npm",
+    node_server = "express",
+    node_version = "22",
+    npm_version = "10",
+)
+
+build = node_build(config)
+
+node_serve(config, build, name = "qa-system")

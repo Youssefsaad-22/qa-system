@@ -1,0 +1,52 @@
+# Wasmer Edge app config — Call Center QA System (single-process backend + frontend).
+# Deploy with:  wasmer deploy   (run from this directory, after building the frontend into ./public)
+kind: wasmer.io/App.v0
+name: qa-system
+# Replace with your wasmer.io username/namespace, or let `wasmer deploy` fill it in.
+owner: your-wasmer-username
+description: Call Center QA Random Sampling & Approval System
+# Package from this directory (uploads the current folder; installs deps on build).
+package: .
+
+capabilities:
+  database:
+    engine: postgres
+
+# Managed Postgres is only available in specific regions; pick one close to the call center.
+locality:
+  regions:
+    - fr-roub1
+
+# Express is single-threaded: only send one request per instance at a time.
+scaling:
+  mode: single_concurrency
+
+health_checks:
+  - http:
+      method: get
+      path: /api/health
+      interval: 30s
+      timeout: 10s
+      unhealthy_threshold: 2
+      healthy_threshold: 1
+      expected_status_codes:
+        - 200
+
+# Persistent storage for Yeastar CDR export files.
+# Mounted at /data; point SYNC_YEASTAR_CSV_DIR below at /data/yeastar_csv
+# and upload exports via SFTP (see runbook).
+volumes:
+  - name: yeastar-data
+    mount: /data
+
+env:
+  PORT: "8080"
+  DB_SSL: "true"
+  SYNC_PROVIDERS: "yeastar"
+  SYNC_YEASTAR_CSV_DIR: "/data/yeastar_csv"
+  SYNC_YEASTAR_INTERVAL_MS: "60000"
+  SYNC_YEASTAR_BASE_URL: ""
+  DIRECTUS_COLLECTION: "directus_users"
+  # Add these via `wasmer app secret set` (never commit secrets):
+  #   JWT_SECRET, DIRECTUS_BASE_URL, DIRECTUS_EMAIL, DIRECTUS_PASSWORD,
+  #   DIRECTUS_WEBHOOK_SECRET, SYNC_YEASTAR_USERNAME, SYNC_YEASTAR_PASSWORD

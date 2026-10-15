@@ -1,0 +1,31 @@
+{
+  "name": "qa-system-backend",
+  "version": "1.0.0",
+  "description": "Call Center QA Sampling System Backend",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/utils/initDb.js && node src/server.js",
+    "build:ui": "npm run build --prefix ../frontend && node scripts/copyUiBuild.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node src/utils/initDb.js",
+    "sync:once": "node src/sync/runOnce.js",
+    "set-seed-passwords": "node scripts/setSeedPasswords.js",
+    "backfill:agent-id": "node scripts/backfillAgentId.js",
+    "test:auth": "node scripts/auth.test.js",
+    "sync:agents": "node scripts/syncDirectusAgents.js",
+    "dev:all": "concurrently \"npm run dev\" \"cd ../frontend && npm run dev\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "read-excel-file": "^9.3.12"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
